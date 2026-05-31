@@ -1,0 +1,39 @@
+[build]
+  publish = "frontend"
+  command = "echo 'No build needed'"
+
+[[redirects]]
+  from = "/manifest.webmanifest"
+  to = "/public/manifest.webmanifest"
+  status = 200
+
+[[redirects]]
+  from = "/sw.js"
+  to = "/public/sw.js"
+  status = 200
+
+[[redirects]]
+  from = "/icons/*"
+  to = "/public/icons/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/vendor/*"
+  to = "/public/vendor/:splat"
+  status = 200
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json; charset=utf-8"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

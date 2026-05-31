@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: filmrevive-api
+    runtime: python
+    rootDir: backend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://filmrevive.com,https://www.filmrevive.com,http://localhost:5173,http://127.0.0.1:5173
