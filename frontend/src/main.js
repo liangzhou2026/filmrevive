@@ -15,6 +15,7 @@ const TEXT = {
   download: "\u4e0b\u8f7d\u6b63\u7247",
   processFailed: "\u56fe\u7247\u5904\u7406\u5931\u8d25\u3002",
   processFailedRetry: "\u56fe\u7247\u5904\u7406\u5931\u8d25\uff0c\u8bf7\u6362\u4e00\u5f20\u7167\u7247\u518d\u8bd5\u3002",
+  networkFailed: "\u5904\u7406\u5931\u8d25\uff1a\u540e\u7aef\u53ef\u80fd\u6b63\u5728\u91cd\u542f\uff0c\u6216\u56fe\u7247\u8fc7\u5927\u3002\u8bf7\u5c06\u56fe\u7247\u538b\u7f29\u5230 25MB \u4ee5\u5185\u540e\u91cd\u8bd5\u3002",
   colorCastTitle: "\u4e00\u952e\u53bb\u8272\u7f69",
   oneClickColorCast: "\u53bb\u6a59\u8272\u7f69\u3001RGB \u8865\u507f\u3001\u81ea\u52a8\u8272\u9636",
   repairTitle: "\u4fee\u590d\u9009\u9879",
@@ -103,7 +104,11 @@ function App() {
         return;
       }
       setState("error");
-      setError(err instanceof Error ? err.message : TEXT.processFailed);
+      if (err instanceof TypeError) {
+        setError(TEXT.networkFailed);
+      } else {
+        setError(err instanceof Error ? err.message : TEXT.processFailed);
+      }
     } finally {
       setAbortController(null);
     }

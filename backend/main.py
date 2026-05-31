@@ -34,7 +34,8 @@ app.add_middleware(
 )
 
 SUPPORTED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff"}
-MAX_UPLOAD_BYTES = 120 * 1024 * 1024
+MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+MAX_PROCESSING_SIDE = 2400
 PROCESSING_TIMEOUT_SECONDS = 90
 
 
@@ -46,7 +47,19 @@ def decode_upload(file_bytes: bytes) -> np.ndarray:
         raise HTTPException(status_code=400, detail="Cannot read image. Please upload JPG, PNG, WEBP, BMP, or TIFF.")
 
     image_rgb = np.array(pil_image)
-    return cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+    image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+    return resize_for_processing(image_bgr)
+
+
+def resize_for_processing(image_bgr: np.ndarray) -> np.ndarray:
+    height, width = image_bgr.shape[:2]
+    max_side = max(width, height)
+    if max_side <= MAX_PROCESSING_SIDE:
+        return image_bgr
+
+    scale = MAX_PROCESSING_SIDE / max_side
+    target_size = (max(1, int(width * scale)), max(1, int(height * scale)))
+    return cv2.resize(image_bgr, target_size, interpolation=cv2.INTER_AREA)
 
 
 def invert_negative(image_bgr: np.ndarray) -> np.ndarray:
@@ -402,7 +415,7 @@ async def convert_negative(
     if not file_bytes:
         raise HTTPException(status_code=400, detail="Image file is empty.")
     if len(file_bytes) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="File is too large. Please upload an image under 120MB.")
+        raise HTTPException(status_code=413, detail="File is too large. Please upload an image under 25MB.")
 
     try:
         processed = await asyncio.wait_for(

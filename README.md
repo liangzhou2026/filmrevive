@@ -116,6 +116,12 @@ curl -X POST http://127.0.0.1:8001/api/convert \
 
 RAW 文件例如 `.fff`、`.3fr`、`.dng` 暂不支持。建议先用 Hasselblad Phocus、Lightroom 或 Capture One 导出为 TIFF/JPG 后再上传。
 
+线上 Render 免费实例使用云端安全模式：
+
+- 上传文件限制：25MB
+- 处理前自动缩小到最长边 2400px
+- 这样可以避免 OpenCV 处理大图时超过云服务器内存
+
 ## 一键去色罩
 
 一键去色罩会按顺序执行：
