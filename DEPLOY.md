@@ -2,16 +2,20 @@
 
 目标：
 
-- 域名：`filmrevive.com`
-- 前端：Netlify，访问 `https://filmrevive.com`
-- 后端：Render，访问 `https://api.filmrevive.com`
+- 域名：`filmrevive.app`
+- 前端：Netlify，访问 `https://filmrevive.app`
+- 后端：Render，访问 `https://api.filmrevive.app`
 - DNS：Cloudflare
 
-## 1. 上传代码到 GitHub
+## 1. GitHub
 
-1. 新建 GitHub 仓库，例如 `filmrevive`
-2. 把 `FilmRevive` 文件夹里的内容作为仓库根目录上传
-3. 确保仓库根目录能看到：
+项目已上传到：
+
+```text
+https://github.com/liangzhou2026/filmrevive
+```
+
+仓库根目录应包含：
 
 ```text
 backend/
@@ -19,23 +23,14 @@ frontend/
 netlify.toml
 render.yaml
 README.md
+DEPLOY.md
 ```
 
-## 2. Cloudflare 购买域名
+## 2. Render 后端
 
-1. 打开 Cloudflare Registrar
-2. 搜索并购买 `filmrevive.com`
-3. 购买完成后，在 Cloudflare DNS 页面保留这个域名
+Render 会读取仓库根目录的 `render.yaml`。
 
-## 3. Render 部署后端
-
-1. 打开 Render
-2. New + -> Blueprint
-3. 连接 GitHub 仓库
-4. Render 会读取 `render.yaml`
-5. 创建服务 `filmrevive-api`
-
-如果不用 Blueprint，也可以 New + -> Web Service，手动填写：
+服务配置：
 
 ```text
 Name: filmrevive-api
@@ -48,100 +43,19 @@ Health Check Path: /api/health
 环境变量：
 
 ```text
-CORS_ORIGINS=https://filmrevive.com,https://www.filmrevive.com,http://localhost:5173,http://127.0.0.1:5173
+CORS_ORIGINS=https://filmrevive.app,https://www.filmrevive.app,http://localhost:5173,http://127.0.0.1:5173
 ```
 
-部署成功后，先记下 Render 默认域名，例如：
+Render 默认后端地址：
 
 ```text
 https://filmrevive-api.onrender.com
 ```
 
-## 4. Render 绑定后端域名
-
-在 Render 的 `filmrevive-api` 服务里：
-
-1. Settings -> Custom Domains
-2. 添加：
+测试：
 
 ```text
-api.filmrevive.com
-```
-
-Render 会给你一个 DNS 目标，通常类似：
-
-```text
-filmrevive-api.onrender.com
-```
-
-回到 Cloudflare DNS，添加：
-
-```text
-Type: CNAME
-Name: api
-Target: filmrevive-api.onrender.com
-Proxy status: DNS only
-```
-
-等 Render 显示证书签发成功后，后端地址就是：
-
-```text
-https://api.filmrevive.com
-```
-
-## 5. Netlify 部署前端
-
-1. 打开 Netlify
-2. Add new site -> Import an existing project
-3. 选择 GitHub 仓库
-4. 构建设置：
-
-```text
-Base directory: 留空
-Build command: 留空
-Publish directory: frontend
-```
-
-如果 Netlify 读取到了 `netlify.toml`，它会自动使用这些设置。
-
-部署成功后，先记下 Netlify 默认域名，例如：
-
-```text
-https://xxxx.netlify.app
-```
-
-## 6. Netlify 绑定主域名
-
-在 Netlify 站点：
-
-1. Domain management
-2. Add domain
-3. 输入：
-
-```text
-filmrevive.com
-www.filmrevive.com
-```
-
-Netlify 会给你 DNS 记录。
-
-回到 Cloudflare DNS，常见设置是：
-
-```text
-Type: CNAME
-Name: www
-Target: 你的-netlify-域名.netlify.app
-Proxy status: DNS only
-```
-
-根域名 `filmrevive.com` 按 Netlify 页面提示添加。通常 Netlify 会给 A 记录或 ALIAS/flattening 方案；在 Cloudflare 里可以使用 CNAME flattening。
-
-## 7. 最终检查
-
-打开：
-
-```text
-https://api.filmrevive.com/api/health
+https://filmrevive-api.onrender.com/api/health
 ```
 
 应该看到：
@@ -150,32 +64,117 @@ https://api.filmrevive.com/api/health
 {"status":"ok"}
 ```
 
-打开：
+## 3. Render 绑定后端域名
+
+在 Render 的 `filmrevive-api` 服务里：
 
 ```text
-https://filmrevive.com
+Settings -> Custom Domains -> Add Custom Domain
 ```
 
-测试上传一张 JPG/PNG/TIFF。
+添加：
 
-如果前端能打开但处理失败，通常是 CORS 或后端域名没生效：
+```text
+api.filmrevive.app
+```
 
-1. 确认 `https://api.filmrevive.com/api/health` 能打开
-2. 确认 Render 环境变量 `CORS_ORIGINS` 包含 `https://filmrevive.com`
-3. 修改环境变量后，在 Render 里重新部署一次
+Render 要求在 Cloudflare DNS 添加：
 
-## 8. 手机安装为 App
+```text
+Type: CNAME
+Name: api
+Target: filmrevive-api.onrender.com
+Proxy status: DNS only
+TTL: Auto
+```
 
-部署到 HTTPS 后：
+验证成功后测试：
+
+```text
+https://api.filmrevive.app/api/health
+```
+
+## 4. Netlify 前端
+
+Netlify 会读取仓库根目录的 `netlify.toml`。
+
+部署设置：
+
+```text
+Build command: echo 'No build needed'
+Publish directory: frontend
+Branch: main
+```
+
+Netlify 默认前端地址：
+
+```text
+https://filmrevive.netlify.app
+```
+
+## 5. Netlify 绑定前端域名
+
+在 Netlify：
+
+```text
+Domain management -> Add a domain
+```
+
+添加：
+
+```text
+filmrevive.app
+www.filmrevive.app
+```
+
+在 Cloudflare DNS 添加或确认：
+
+```text
+Type: A
+Name: @
+Target: Netlify 提供的 A 记录 IP
+Proxy status: DNS only
+TTL: Auto
+```
+
+以及：
+
+```text
+Type: CNAME
+Name: www
+Target: filmrevive.netlify.app
+Proxy status: DNS only
+TTL: Auto
+```
+
+如果 Netlify 给出不同 DNS 指引，以 Netlify 页面为准。
+
+## 6. 最终测试
+
+后端：
+
+```text
+https://api.filmrevive.app/api/health
+```
+
+前端：
+
+```text
+https://filmrevive.app
+```
+
+上传一张 JPG/PNG/TIFF 测试一键去色罩。
+
+## 7. 手机安装为 App
 
 Android Chrome：
 
 ```text
-打开 filmrevive.com -> 菜单 -> 添加到主屏幕
+打开 filmrevive.app -> 菜单 -> 添加到主屏幕
 ```
 
 iPhone Safari：
 
 ```text
-打开 filmrevive.com -> 分享 -> 添加到主屏幕
+打开 filmrevive.app -> 分享 -> 添加到主屏幕
 ```

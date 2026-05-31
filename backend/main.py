@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import os
 from io import BytesIO
 
@@ -15,8 +15,8 @@ app = FastAPI(title="FilmRevive API", version="0.1.0")
 DEFAULT_CORS_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://filmrevive.com",
-    "https://www.filmrevive.com",
+    "https://filmrevive.app",
+    "https://www.filmrevive.app",
 ]
 
 cors_origins = [
@@ -43,7 +43,7 @@ def decode_upload(file_bytes: bytes) -> np.ndarray:
         pil_image = Image.open(BytesIO(file_bytes))
         pil_image = ImageOps.exif_transpose(pil_image).convert("RGB")
     except UnidentifiedImageError:
-        raise HTTPException(status_code=400, detail="无法读取图片，请上传 JPG、PNG、WEBP、BMP 或 TIFF。")
+        raise HTTPException(status_code=400, detail="Cannot read image. Please upload JPG, PNG, WEBP, BMP, or TIFF.")
 
     image_rgb = np.array(pil_image)
     return cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
@@ -394,15 +394,15 @@ async def convert_negative(
     extension = f".{filename.rsplit('.', 1)[-1].lower()}" if "." in filename else ""
 
     if extension and extension not in SUPPORTED_IMAGE_EXTENSIONS:
-        raise HTTPException(status_code=400, detail="暂不支持这个文件格式，请上传 JPG、PNG、WEBP、BMP 或 TIFF。")
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload JPG, PNG, WEBP, BMP, or TIFF.")
     if file.content_type and not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="请上传 JPG、PNG、WEBP、BMP 或 TIFF 图片文件。")
+        raise HTTPException(status_code=400, detail="Please upload an image file.")
 
     file_bytes = await file.read()
     if not file_bytes:
-        raise HTTPException(status_code=400, detail="图片文件为空。")
+        raise HTTPException(status_code=400, detail="Image file is empty.")
     if len(file_bytes) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="文件太大，请上传 120MB 以内的图片。")
+        raise HTTPException(status_code=413, detail="File is too large. Please upload an image under 120MB.")
 
     try:
         processed = await asyncio.wait_for(
@@ -415,11 +415,11 @@ async def convert_negative(
             timeout=PROCESSING_TIMEOUT_SECONDS,
         )
     except asyncio.TimeoutError:
-        raise HTTPException(status_code=408, detail="处理时间过长，已停止。请先把大文件导出为较小的 TIFF/JPG 后再试。")
+        raise HTTPException(status_code=408, detail="Processing timed out. Please try a smaller TIFF/JPG file.")
 
     success, encoded = cv2.imencode(".jpg", processed, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
     if not success:
-        raise HTTPException(status_code=500, detail="图片编码失败。")
+        raise HTTPException(status_code=500, detail="Image encoding failed.")
 
     return Response(
         content=BytesIO(encoded.tobytes()).getvalue(),

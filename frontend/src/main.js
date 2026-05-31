@@ -1,8 +1,8 @@
-const API_BASE_URL =
+﻿const API_BASE_URL =
   window.FILMREVIVE_API_BASE_URL ||
   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
     ? "http://127.0.0.1:8001"
-    : "https://api.filmrevive.com");
+    : "https://api.filmrevive.app");
 const { useEffect, useState } = React;
 
 const TEXT = {
