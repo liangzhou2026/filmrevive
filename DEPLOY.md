@@ -43,7 +43,7 @@ Health Check Path: /api/health
 环境变量：
 
 ```text
-CORS_ORIGINS=https://filmrevive.app,https://www.filmrevive.app,http://localhost:5173,http://127.0.0.1:5173
+CORS_ORIGINS=https://filmrevive.app,https://www.filmrevive.app,https://filmrevive.netlify.app,http://localhost:5173,http://127.0.0.1:5173
 ```
 
 Render 默认后端地址：

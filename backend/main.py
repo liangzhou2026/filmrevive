@@ -17,6 +17,7 @@ DEFAULT_CORS_ORIGINS = [
     "http://127.0.0.1:5173",
     "https://filmrevive.app",
     "https://www.filmrevive.app",
+    "https://filmrevive.netlify.app",
 ]
 
 cors_origins = [

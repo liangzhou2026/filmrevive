@@ -9,4 +9,4 @@
     healthCheckPath: /api/health
     envVars:
       - key: CORS_ORIGINS
-        value: https://filmrevive.app,https://www.filmrevive.app,http://localhost:5173,http://127.0.0.1:5173
+        value: https://filmrevive.app,https://www.filmrevive.app,https://filmrevive.netlify.app,http://localhost:5173,http://127.0.0.1:5173
